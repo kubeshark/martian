@@ -118,6 +118,10 @@ type Request struct {
 	// BodySize is the size of the request body (POST data payload) in bytes. Set
 	// to -1 if the info is not available.
 	BodySize int64 `json:"bodySize"`
+
+	// Additions
+	Path         string   `json:"path"`
+	PathSegments []string `json:"pathSegments"`
 }
 
 // Response holds data about an individual HTTP response.
