@@ -526,14 +526,16 @@ func (l *Logger) RecordRequest(id string, req *http.Request) error {
 // returned from req.Body.Read.
 func NewRequest(req *http.Request, withBody bool) (*Request, error) {
 	r := &Request{
-		Method:      req.Method,
-		URL:         req.URL.String(),
-		HTTPVersion: req.Proto,
-		HeadersSize: -1,
-		BodySize:    req.ContentLength,
-		QueryString: []QueryString{},
-		Headers:     headers(proxyutil.RequestHeader(req).Map()),
-		Cookies:     cookies(req.Cookies()),
+		Method:       req.Method,
+		URL:          req.URL.String(),
+		HTTPVersion:  req.Proto,
+		HeadersSize:  -1,
+		BodySize:     req.ContentLength,
+		QueryString:  []QueryString{},
+		Headers:      headers(proxyutil.RequestHeader(req).Map()),
+		Cookies:      cookies(req.Cookies()),
+		Path:         req.URL.Path,
+		PathSegments: strings.Split(req.URL.Path, "/")[1:],
 	}
 
 	for n, vs := range req.URL.Query() {
