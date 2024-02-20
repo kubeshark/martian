@@ -601,6 +601,10 @@ func NewResponse(res *http.Response, withBody bool) (*Response, error) {
 		Cookies:     cookies(res.Cookies()),
 	}
 
+	if r.BodySize < 0 {
+		r.BodySize = 0
+	}
+
 	if res.StatusCode >= 300 && res.StatusCode < 400 {
 		r.RedirectURL = res.Header.Get("Location")
 	}
