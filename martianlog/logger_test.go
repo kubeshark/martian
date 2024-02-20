@@ -22,9 +22,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/martian/v3"
-	"github.com/google/martian/v3/parse"
-	"github.com/google/martian/v3/proxyutil"
+	"github.com/kubeshark/martian/v3"
+	"github.com/kubeshark/martian/v3/parse"
+	"github.com/kubeshark/martian/v3/proxyutil"
 )
 
 func ExampleLogger() {

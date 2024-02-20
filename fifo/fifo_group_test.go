@@ -21,13 +21,13 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/google/martian/v3"
-	"github.com/google/martian/v3/martiantest"
-	"github.com/google/martian/v3/parse"
-	"github.com/google/martian/v3/proxyutil"
-	"github.com/google/martian/v3/verify"
+	"github.com/kubeshark/martian/v3"
+	"github.com/kubeshark/martian/v3/martiantest"
+	"github.com/kubeshark/martian/v3/parse"
+	"github.com/kubeshark/martian/v3/proxyutil"
+	"github.com/kubeshark/martian/v3/verify"
 
-	_ "github.com/google/martian/v3/header"
+	_ "github.com/kubeshark/martian/v3/header"
 )
 
 func TestGroupFromJSON(t *testing.T) {

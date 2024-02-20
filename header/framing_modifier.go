@@ -19,7 +19,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/google/martian/v3"
+	"github.com/kubeshark/martian/v3"
 )
 
 // NewBadFramingModifier makes a best effort to fix inconsistencies in the

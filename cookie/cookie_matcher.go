@@ -17,7 +17,7 @@ package cookie
 import (
 	"net/http"
 
-	"github.com/google/martian/v3/log"
+	"github.com/kubeshark/martian/v3/log"
 )
 
 // Matcher is a conditonal evalutor of request or

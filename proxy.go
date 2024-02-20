@@ -28,11 +28,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/martian/v3/log"
-	"github.com/google/martian/v3/mitm"
-	"github.com/google/martian/v3/nosigpipe"
-	"github.com/google/martian/v3/proxyutil"
-	"github.com/google/martian/v3/trafficshape"
+	"github.com/kubeshark/martian/v3/log"
+	"github.com/kubeshark/martian/v3/mitm"
+	"github.com/kubeshark/martian/v3/nosigpipe"
+	"github.com/kubeshark/martian/v3/proxyutil"
+	"github.com/kubeshark/martian/v3/trafficshape"
 )
 
 var errClose = errors.New("closing connection")
@@ -509,7 +509,7 @@ func (p *Proxy) handle(ctx *Context, conn net.Conn, brw *bufio.ReadWriter) error
 	defer res.Body.Close()
 
 	// set request to original request manually, res.Request may be changed in transport.
-	// see https://github.com/google/martian/issues/298
+	// see https://github.com/kubeshark/martian/issues/298
 	res.Request = req
 
 	if err := p.resmod.ModifyResponse(res); err != nil {
