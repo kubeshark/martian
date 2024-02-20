@@ -103,12 +103,12 @@ type Request struct {
 	URL string `json:"url"`
 	// HTTPVersion is the Request HTTP version (HTTP/1.1).
 	HTTPVersion string `json:"httpVersion"`
-	// Cookies is a list of cookies.
-	Cookies []Cookie `json:"cookies"`
-	// Headers is a list of headers.
-	Headers []Header `json:"headers"`
-	// QueryString is a list of query parameters.
-	QueryString []QueryString `json:"queryString"`
+	// Cookies is a map of cookies.
+	Cookies map[string]Cookie `json:"cookies"`
+	// Headers is a map of headers.
+	Headers map[string]string `json:"headers"`
+	// QueryString is a map of query parameters.
+	QueryString map[string]string `json:"queryString"`
 	// PostData is the posted data information.
 	PostData *PostData `json:"postData,omitempty"`
 	// HeaderSize is the Total number of bytes from the start of the HTTP request
@@ -132,10 +132,10 @@ type Response struct {
 	StatusText string `json:"statusText"`
 	// HTTPVersion is the Response HTTP version (HTTP/1.1).
 	HTTPVersion string `json:"httpVersion"`
-	// Cookies is a list of cookies.
-	Cookies []Cookie `json:"cookies"`
-	// Headers is a list of headers.
-	Headers []Header `json:"headers"`
+	// Cookies is a map of cookies.
+	Cookies map[string]Cookie `json:"cookies"`
+	// Headers is a map of headers.
+	Headers map[string]string `json:"headers"`
 	// Content contains the details of the response body.
 	Content *Content `json:"content"`
 	// RedirectURL is the target URL from the Location response header.
@@ -185,22 +185,6 @@ type Cookie struct {
 	// Secure is set to true if the cookie was transmitted over SSL, false
 	// otherwise.
 	Secure bool `json:"secure,omitempty"`
-}
-
-// Header is an HTTP request or response header.
-type Header struct {
-	// Name is the header name.
-	Name string `json:"name"`
-	// Value is the header value.
-	Value string `json:"value"`
-}
-
-// QueryString is a query string parameter on a request.
-type QueryString struct {
-	// Name is the query parameter name.
-	Name string `json:"name"`
-	// Value is the query parameter value.
-	Value string `json:"value"`
 }
 
 // PostData describes posted data on a request.
@@ -507,7 +491,7 @@ func (l *Logger) RecordRequest(id string, req *http.Request) error {
 	defer l.mu.Unlock()
 
 	if _, exists := l.entries[id]; exists {
-		return fmt.Errorf("Duplicate request ID: %s", id)
+		return fmt.Errorf("duplicate request ID: %s", id)
 	}
 	l.entries[id] = entry
 	if l.tail == nil {
@@ -531,7 +515,7 @@ func NewRequest(req *http.Request, withBody bool) (*Request, error) {
 		HTTPVersion:  req.Proto,
 		HeadersSize:  -1,
 		BodySize:     req.ContentLength,
-		QueryString:  []QueryString{},
+		QueryString:  make(map[string]string),
 		Headers:      headers(proxyutil.RequestHeader(req).Map()),
 		Cookies:      cookies(req.Cookies()),
 		Path:         req.URL.Path,
@@ -540,10 +524,11 @@ func NewRequest(req *http.Request, withBody bool) (*Request, error) {
 
 	for n, vs := range req.URL.Query() {
 		for _, v := range vs {
-			r.QueryString = append(r.QueryString, QueryString{
-				Name:  n,
-				Value: v,
-			})
+			if _, ok := r.QueryString[n]; ok {
+				r.QueryString[n] = fmt.Sprintf("%s, %s", r.QueryString[n], v)
+			} else {
+				r.QueryString[n] = v
+			}
 		}
 	}
 
@@ -708,8 +693,8 @@ func (l *Logger) Reset() {
 	l.tail = nil
 }
 
-func cookies(cs []*http.Cookie) []Cookie {
-	hcs := make([]Cookie, 0, len(cs))
+func cookies(cs []*http.Cookie) map[string]Cookie {
+	hcs := make(map[string]Cookie)
 
 	for _, c := range cs {
 		var expires string
@@ -717,7 +702,7 @@ func cookies(cs []*http.Cookie) []Cookie {
 			expires = c.Expires.Format(time.RFC3339)
 		}
 
-		hcs = append(hcs, Cookie{
+		hcs[c.Name] = Cookie{
 			Name:        c.Name,
 			Value:       c.Value,
 			Path:        c.Path,
@@ -726,21 +711,22 @@ func cookies(cs []*http.Cookie) []Cookie {
 			Secure:      c.Secure,
 			Expires:     c.Expires,
 			Expires8601: expires,
-		})
+		}
 	}
 
 	return hcs
 }
 
-func headers(hs http.Header) []Header {
-	hhs := make([]Header, 0, len(hs))
+func headers(hs http.Header) map[string]string {
+	hhs := make(map[string]string)
 
 	for n, vs := range hs {
 		for _, v := range vs {
-			hhs = append(hhs, Header{
-				Name:  n,
-				Value: v,
-			})
+			if _, ok := hhs[n]; ok {
+				hhs[n] = fmt.Sprintf("%s, %s", hhs[n], v)
+			} else {
+				hhs[n] = v
+			}
 		}
 	}
 

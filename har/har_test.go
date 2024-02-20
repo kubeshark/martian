@@ -92,11 +92,8 @@ func TestModifyRequest(t *testing.T) {
 		t.Fatalf("len(hreq.QueryString): got %d, want %q", got, want)
 	}
 
-	qs := hreq.QueryString[0]
-	if got, want := qs.Name, "query"; got != want {
-		t.Errorf("qs.Name: got %q, want %q", got, want)
-	}
-	if got, want := qs.Value, "true"; got != want {
+	qs := hreq.QueryString["query"]
+	if got, want := qs, "true"; got != want {
 		t.Errorf("qs.Value: got %q, want %q", got, want)
 	}
 
@@ -113,19 +110,16 @@ func TestModifyRequest(t *testing.T) {
 		t.Fatalf("len(hreq.Cookies): got %d, want %d", got, want)
 	}
 
-	hcookie := hreq.Cookies[0]
-	if got, want := hcookie.Name, "request"; got != want {
-		t.Errorf("hcookie.Name: got %q, want %q", got, want)
-	}
+	hcookie := hreq.Cookies["request"]
 	if got, want := hcookie.Value, "cookie"; got != want {
 		t.Errorf("hcookie.Value: got %q, want %q", got, want)
 	}
 }
 
-func headersToHTTP(hs []Header) http.Header {
+func headersToHTTP(hs map[string]string) http.Header {
 	hh := http.Header{}
-	for _, h := range hs {
-		hh[h.Name] = append(hh[h.Name], h.Value)
+	for k, v := range hs {
+		hh[k] = []string{v}
 	}
 	return hh
 }
@@ -206,7 +200,7 @@ func TestModifyResponse(t *testing.T) {
 		t.Fatalf("len(hres.Cookies): got %d, want %d", got, want)
 	}
 
-	hcookie := hres.Cookies[0]
+	hcookie := hres.Cookies["response"]
 	if got, want := hcookie.Name, "response"; got != want {
 		t.Errorf("hcookie.Name: got %q, want %q", got, want)
 	}
