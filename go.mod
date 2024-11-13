@@ -1,6 +1,6 @@
 module github.com/kubeshark/martian/v3
 
-go 1.18
+go 1.22.4
 
 require (
 	github.com/golang/snappy v0.0.3

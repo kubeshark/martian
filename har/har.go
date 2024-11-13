@@ -24,7 +24,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime"
 	"mime/multipart"
 	"net/http"
@@ -610,10 +609,7 @@ func NewResponse(res *http.Response, withBody bool) (*Response, error) {
 			return nil, err
 		}
 
-		body, err := ioutil.ReadAll(br)
-		if err != nil {
-			return nil, err
-		}
+		body, _ := io.ReadAll(br)
 
 		r.Content.Text = body
 		r.Content.Size = int64(len(body))
@@ -780,10 +776,7 @@ func postData(req *http.Request, logBody bool) (*PostData, error) {
 			}
 			defer p.Close()
 
-			body, err := ioutil.ReadAll(p)
-			if err != nil {
-				return nil, err
-			}
+			body, _ := io.ReadAll(p)
 
 			pd.Params = append(pd.Params, Param{
 				Name:        p.FormName(),
@@ -793,10 +786,7 @@ func postData(req *http.Request, logBody bool) (*PostData, error) {
 			})
 		}
 	case "application/x-www-form-urlencoded":
-		body, err := ioutil.ReadAll(br)
-		if err != nil {
-			return nil, err
-		}
+		body, _ := io.ReadAll(br)
 
 		vs, err := url.ParseQuery(string(body))
 		if err != nil {
@@ -812,10 +802,7 @@ func postData(req *http.Request, logBody bool) (*PostData, error) {
 			}
 		}
 	default:
-		body, err := ioutil.ReadAll(br)
-		if err != nil {
-			return nil, err
-		}
+		body, _ := io.ReadAll(br)
 
 		pd.Text = string(body)
 	}
